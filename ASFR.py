@@ -9,6 +9,7 @@ import pandas as pd
 import datetime
 import time
 from tkinter import messagebox
+import mysql.connector
 
 ### for all function of main_frame system
 
@@ -312,9 +313,9 @@ def mainframe():
     message = tk.Label(win, text="Automated Attendance System using Face Recognition", fg="white", bg="black",
                        width=55, height=2, font=('times', 30, ' bold '))
 
-    message.place(x=80, y=20)
+    message.place(x=80, y=50)
 
-    lbl = tk.Label(win, text="Enter Student Roll no.", width=20, height=2, fg="white", bg="black", borderwidth=2,
+    lbl = tk.Label(win, text="Enter Student Roll no.", width=20, height=2, fg="white", bg="black",
                    relief="raised", font=('times', 15, ' bold '))
     lbl.place(x=200, y=300)
 
@@ -324,56 +325,56 @@ def mainframe():
     txt['validatecommand'] = (txt.register(testVal), '%P', '%d')
     txt.place(x=550, y=300)
 
-    lbl2 = tk.Label(win, text="Enter Student Name", width=20, fg="white", bg="black", height=2, borderwidth=2,
+    lbl2 = tk.Label(win, text="Enter Student Name", width=20, fg="white", bg="black", height=2,
                     relief="raised", font=('times', 15, ' bold '))
     lbl2.place(x=200, y=400)
 
     txt2 = tk.Entry(win, width=20, bg="white", fg="red", font=('times', 25, ' bold '))
     txt2.place(x=550, y=400)
 
-    lbl3 = tk.Label(win, text="Notification", width=20, fg="white", bg="black", height=2, borderwidth=2,
+    lbl3 = tk.Label(win, text="Notification", width=20, fg="white", bg="black", height=2,
                     relief="raised", font=('times', 15, ' bold '))
     lbl3.place(x=200, y=500)
 
     Notification = tk.Label(win, text="All things good", bg="Green", fg="white", width=15,
                             height=3, font=('times', 17, 'bold'))
 
-    clearButton = tk.Button(win, text="Clear", command=clear, fg="white", bg="black", width=10, height=1,
+    clearButton = tk.Button(win,borderwidth=4, text="Clear", command=clear, fg="white", bg="black", width=10, height=1,
                             activebackground="Red", font=('times', 15, ' bold '))
     clearButton.place(x=950, y=300)
 
-    clearButton1 = tk.Button(win, text="Clear", command=clear1, fg="white", bg="black", width=10, height=1,
+    clearButton1 = tk.Button(win,borderwidth=4, text="Clear", command=clear1, fg="white", bg="black", width=10, height=1,
                              activebackground="Red", font=('times', 15, ' bold '))
     clearButton1.place(x=950, y=400)
 
-    check_registerstudent_button = tk.Button(win, text="Check Register students", command=check_register_students, fg="white", bg="black", width=19,
+    check_registerstudent_button = tk.Button(win,borderwidth=4, text="Check Register students", command=check_register_students, fg="white", bg="black", width=19,
                    height=2, activebackground="Red", font=('times', 15, ' bold '))
     check_registerstudent_button.place(x=1150, y=500)
 
-    take_Img = tk.Button(win, text="Take Images", command=take_img, fg="white", bg="black", borderwidth=2,
+    take_Img = tk.Button(win, text="Take Images", command=take_img, fg="white", bg="black",borderwidth=4,
                         relief="raised", width=20, height=3, activebackground="Red", font=('times', 15, ' bold '))
     take_Img.place(x=90, y=600)
 
-    train_Img = tk.Button(win, text="Train Images", command=trainimg, fg="white", bg="black", width=20, height=3,
+    train_Img = tk.Button(win,borderwidth=4, text="Train Images", command=trainimg, fg="white", bg="black", width=20, height=3,
                          activebackground="Red", font=('times', 15, ' bold '))
     train_Img.place(x=450, y=600)
 
-    fill_attendance = tk.Button(win, text="Fill Attendance", command=track_attendance, fg="white", bg="black", width=20, height=3,
+    fill_attendance = tk.Button(win,borderwidth=4, text="Fill Attendance", command=track_attendance, fg="white", bg="black", width=20, height=3,
                    activebackground="Red", font=('times', 15, ' bold '))
     fill_attendance.place(x=800, y=600)
 
-    check_attendance = tk.Button(win, text="Check student attendance", command=check_student_attendance, fg="white", bg="black",
+    check_attendance = tk.Button(win,borderwidth=4, text="Check student attendance", command=check_student_attendance, fg="white", bg="black",
                            width=20, height=3, activebackground="Red", font=('times', 15, ' bold '))
     check_attendance.place(x=1150, y=600)
 
-    about = tk.Button(win, text="About", fg="white", bg="black", width=9, relief="raised",
+    about = tk.Button(win,borderwidth=4, text="About", fg="white", bg="black", width=9, relief="raised",
                       height=2, activebackground="Red", command=about, font=('times', 20, ' bold '))
     about.place(x=1330, y=80)
     def logoutbtn():
         win.destroy()
-    logoutbtn = tk.Button(win, text="Exit", fg="white", bg="black", width=9, relief="raised",
-                        height=1, activebackground="Red", command=logoutbtn, font=('times', 20, ' bold '))
-    logoutbtn.place(x=50, y=100)
+    logoutbtn = tk.Button(win, text="Exit", fg="white", bg="red", width=9, relief="raised",
+                        height=1, activebackground="green", command=logoutbtn, font=('times', 20, ' bold '))
+    logoutbtn.place(x=50, y=30)
     win.mainloop()
 #####win is our Main frame of system
 win = tk.Tk()
@@ -389,19 +390,146 @@ bgimage = ImageTk.PhotoImage(Image.open("bg.jpg"))
 bglabel = Label(image=bgimage)
 bglabel.pack()
 
+def signupfun():
+    signupwin = tk.Tk()
+    signupwin.geometry('600x720')
+    signupwin.resizable(width=FALSE, height=FALSE)
+    signupwin.title("Sign up")
+    signupwin.configure(background="black")
+
+    def signexitbtn():
+        signupwin.destroy()
+    def signup():
+        global checkname, insert_stmt, data, usernamecheck, cursor
+        username = un_entr.get()
+        password = pw_entr.get()
+        cpassword = rpw_entr.get()
+        l1 = username
+        l2 = password
+        l3 = cpassword
+        # establishing the connection
+        conn = mysql.connector.connect(
+            user='root', password='deepak', host='127.0.0.1', database='asfr')
+
+        # Creating a cursor object using the cursor() method
+
+        if (l1 == '' and l2 == ''):
+            mess = "please enter username and password"
+            messagebox.showwarning("sign up failed", mess)
+        else:
+
+            sql_query = "select * from login where name ='%s' " %l1
+            cursor = conn.cursor()
+            cursor.execute(sql_query)
+            records = cursor.fetchall()
+            count=cursor.rowcount
+            print("Total number of rows in Laptop is: ",count)
+            if(count==1):
+                mess = "username already registered "
+                messagebox.showwarning("sign up failed", mess)
+            else:
+                if (l2 == l3):
+                    insert_stmt = (
+                        "INSERT INTO login(name,pass)"
+                        "VALUES (%s, %s)"
+                    )
+                    data = (l1, l2)
+                    mess = "You are now registered and Now you can login"
+                    signupwin.destroy()
+                    messagebox.showinfo("sign up completed", mess)
+
+                else:
+                    mess = "password do not match please enter same password"
+                    messagebox.showwarning("sign up failed", mess)
+            try:
+                # Executing the SQL command
+                cursor.execute(insert_stmt, data)
+
+                # Commit your changes in the database
+                conn.commit()
+
+            except:
+                # Rolling back in case of error
+                conn.rollback()
+
+                # Closing the connection
+            conn.close()
+
+    def exitbtn():
+        exit()
+
+    un = tk.Label(signupwin, text="Enter username", width=15, height=2, fg="white", bg="black",
+                  font=('times', 17, ' bold '))
+    un.place(x=100, y=100)
+
+    un_entr = tk.Entry(signupwin, width=25, bg="white", fg="red", font=('times', 23, ' bold '))
+    un_entr.place(x=100, y=180)
+
+    pw = tk.Label(signupwin, text="Enter password", width=15, height=2, fg="white", bg="black",
+                  font=('times', 17, ' bold '))
+    pw.place(x=100, y=260)
+
+    pw_entr = tk.Entry(signupwin, width=25, show="*", bg="white", fg="red", font=('times', 23, ' bold '))
+    pw_entr.place(x=100, y=340)
+
+    rpw = tk.Label(signupwin, text="confirm password", width=15, height=2, fg="white", bg="black",
+                   font=('times', 17, ' bold '))
+    rpw.place(x=100, y=420)
+
+    rpw_entr = tk.Entry(signupwin, width=25, show="*", bg="white", fg="red", font=('times', 23, ' bold '))
+    rpw_entr.place(x=100, y=500)
+
+    sigup = tk.Button(signupwin, text="Sign Up", fg="white", bg="green", width=10, relief="raised",
+                      height=2, activebackground="Red", command=signup, font=('times', 15, ' bold '))
+    sigup.place(x=100, y=580)
+    exitbtn = tk.Button(signupwin, text="Exit", fg="white", bg="red", width=9, relief="raised",
+                        height=1, activebackground="green", command=signexitbtn, font=('times', 15, ' bold '))
+    exitbtn.place(x=480, y=10)
+    signupwin.bind("<Return>", (lambda event: signup()))
+    signupwin.mainloop()
 
 def err_login():
     messagebox.showwarning("Login failed", "Username and Password required")
 def log_in():
+    global connection, cursor, dbname, dbpassword
+    import mysql.connector
+    from mysql.connector import Error
     username = un_entr.get()
     password = pw_entr.get()
     l1 = username
     l2 = password
-    if( l1 =='' and l2 == '' ):
+    try:
+        connection = mysql.connector.connect(host='localhost',
+                                             database='asfr',
+                                             user='root',
+                                             password='deepak')
+
+        sql_query = "select * from login where name ='%s' " % l1
+        sql_query_pass = "select * from login where pass ='%s' " % l2
+
+        cursor = connection.cursor()
+        cursor.execute(sql_query, sql_query_pass)
+        records = cursor.fetchall()
+        count = cursor.rowcount
+        if(count==1):
+            for row in records:
+                dbname = row[1]
+                dbpassword = row[2]
+        else:
+            dbname=''
+            dbpassword=''
+    except Error as e:
+        print("Error reading data from MySQL table", e)
+
+    finally:
+        if (connection.is_connected()):
+            connection.close()
+            cursor.close()
+    if (l1 == '' and l2 == ''):
         err_login()
     else:
-        if username == 'deepak':
-            if password == 'deepak':
+        if username == dbname:
+            if password == dbpassword:
                 win.destroy()
                 mainframe()
             else:
@@ -409,7 +537,6 @@ def log_in():
 
         else:
             messagebox.showwarning("Login failed", "Wrong Username")
-
 
 def exitbtn():
     exit()
@@ -428,15 +555,18 @@ pw.place(x=400, y=400)
 pw_entr = tk.Entry(win, width=25, show="*", bg="white", fg="red", font=('times', 23, ' bold '))
 pw_entr.place(x=700, y=420)
 
-Login = tk.Button(win, text="LogIn", fg="white", bg="green", width=10,relief="raised",
+Login = tk.Button(win, text="Log In", fg="white", bg="green", width=10,relief="raised",
                   height=2, activebackground="Red", command=log_in, font=('times', 20, ' bold '))
 Login.place(x=660, y=530)
+sigup = tk.Button(win, text="Sign Up", fg="white", bg="green", width=10,relief="raised",
+                  height=2, activebackground="Red", command=signupfun, font=('times', 20, ' bold '))
+sigup.place(x=850, y=530)
 
 message = tk.Label(win, text="Automated Attendance System using Face Recognition", fg="white", bg="black",
                        width=55, height=2, font=('times', 30, ' bold '))
 message.place(x=80, y=50)
-exitbtn = tk.Button(win, text="Exit", fg="white", bg="black", width=9, relief="raised",
-                        height=1, activebackground="Red", command=exitbtn, font=('times', 20, ' bold '))
+exitbtn = tk.Button(win, text="Exit", fg="white", bg="red", width=9, relief="raised",
+                        height=1, activebackground="green", command=exitbtn, font=('times', 20, ' bold '))
 exitbtn.place(x=1300, y=100)
 
 img = ImageTk.PhotoImage(Image.open("face.png"))
